@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guesthouse</title>
+</head>
+<body>
+  <div id="app">
+  	<h1>Pousadas</h1>
+    <button v-on:click="getInnData">carregar pousadas</button>
+    <ul>
+      <li v-for="item in listInns">
+      	<div>
+          <address>
+            <button v-if="selectedId != item.id" v-on:click="showDetails(item.id)" v-on:click="listRooms">Mostrar detalhes</button><br>
+            {{ item.brandName }}<br>
+            {{ item.city }}
+            <div v-if="selectedId === item.id" >
+              {{ item.brandName }}<br>
+              {{ item.phone }}<br>
+              {{ item.email }}<br>
+              {{ item.address }}<br>
+              {{ item.neighborhood }}<br>
+              {{ item.state }}<br>
+              {{ item.city }}<br>
+              {{ item.zipCode }}<br>
+              {{ item.description }}<br>
+              {{ item.paymentMethods }}<br>
+              {{ item.acceptsPets }}<br>
+              {{ item.usagePolicies }}<br>
+              {{ item.checkIn }}<br>
+              {{ item.checkOut }}<br>
+              {{ item.averageRating }}
+             
+              <h3>Quartos Disponíveis</h3>
+              <div v-for="room in listRooms">
+              	{{ room.title }}
+              	{{ room.description }}
+              	{{ room.dimension }}
+              	{{ room.maxOccupancy }}
+              	{{ room.dailyRate }}
+              	{{ room.privateBathroom }}
+              	{{ room.balcony }}
+              	{{ room.airConditioning }}
+              	{{ room.tv }}
+              	{{ room.wardrobe }}
+              	{{ room.safeAvailable }}
+              	{{ room.accessibleForDisabled }}
+              	{{ room.forReservations }}
+              </div>
+              <button v-on:click="hideDetails">Minimizar</button>
+            </div>
+          </address>
+        </div>
+      </li>
+    </ul>
+    <div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/vue-router@4"></script>
+  <script src="main.js" type="text/javascript"></script>
+</body>
+</html>
