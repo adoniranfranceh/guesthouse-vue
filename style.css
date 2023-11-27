@@ -1,0 +1,91 @@
+body {
+  background: #F8F4FD;
+  text-align: center;
+  margin: 20px;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card, .room-card {
+  background: white;
+  margin-bottom: 20px;
+  padding: 20px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.room-card {
+  margin-bottom: 10px;
+  padding: 10px;
+  text-align: left;
+}
+
+.button {
+  background: #3E57DB;
+  color: white;
+  font-size: 16px;
+  border: none;
+  padding: 8px;
+  border-radius: 10px;
+  margin-left: 10px;
+}
+
+.input {
+  font-size: 16px;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+}
+
+.msg {
+  color: red;
+  margin-top: 20px;
+  margin-right: 100px;
+}
+
+.warning-message {
+  color: gray;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Estilizando resultado de busca por disponibilidade */
+
+.result-section {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.result-text {
+  font-size: 16px;
+  color: #333;
+}
+
+.result-status {
+  font-weight: bold;
+  color: #008000;
+}
+
+.result-not-available {
+  font-weight: bold;
+  color: #ff0000;
+}
+
+.result-total {
+  font-weight: bold;
+  color: #333;
+}
+
+.result-info {
+  font-style: italic;
+  color: #555;
+}

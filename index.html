@@ -1,65 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Guesthouse</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
   <div id="app">
-  	<h1>Pousadas</h1>
-    <button v-on:click="getInnData">carregar pousadas</button>
+    <h1>Pousadas</h1>
+    <input type="text" name="" placeholder="Buscar pousadas" v-model="searchText" class="input">
+    {{ searchText }}
+    <button class="button" v-on:click="getInnData">carregar pousadas</button>
     <ul>
-      <li v-for="item in listInns">
-      	<div>
+      <li v-for="item in listResult">
+        <div class="card">
           <address>
-            <button v-if="selectedId != item.id" v-on:click="showDetails(item.id)" v-on:click="listRooms">Mostrar detalhes</button><br>
-            {{ item.brandName }}<br>
-            {{ item.city }}
-            <div v-if="selectedId === item.id" >
-              {{ item.brandName }}<br>
-              {{ item.phone }}<br>
-              {{ item.email }}<br>
-              {{ item.address }}<br>
-              {{ item.neighborhood }}<br>
-              {{ item.state }}<br>
-              {{ item.city }}<br>
-              {{ item.zipCode }}<br>
-              {{ item.description }}<br>
-              {{ item.paymentMethods }}<br>
-              {{ item.acceptsPets }}<br>
-              {{ item.usagePolicies }}<br>
-              {{ item.checkIn }}<br>
-              {{ item.checkOut }}<br>
-              {{ item.averageRating }}
-             
+            <h4>{{ item.brandName }}</h4>
+            <button class="button" v-if="selectedId != item.id" v-on:click="showDetails(item.id)">Mostrar detalhes</button><br>
+            <div v-if="selectedId === item.id" class="inn-details">
+              <p><strong>Telefone:</strong> {{ item.phone }}</p>
+              <p><strong>Email:</strong> {{ item.email }}</p>
+              <p><strong>Endereço:</strong> {{ item.address }}, {{ item.neighborhood }}, {{ item.city }}, {{ item.state }}, {{ item.zipCode }}</p>
+              <p><strong>Descrição:</strong> {{ item.description }}</p>
+              <p><strong>Métodos de Pagamento:</strong> {{ item.paymentMethods }}</p>
+              <p><strong>Animais de Estimação Permitidos:</strong> {{ item.acceptsPets ? 'Sim' : 'Não' }}</p>
+              <p><strong>Políticas de Uso:</strong> {{ item.usagePolicies }}</p>
+              <p><strong>Check-in:</strong> {{ item.checkIn }}</p>
+              <p><strong>Check-out:</strong> {{ item.checkOut }}</p>
+              <p><strong>Avaliação Média:</strong> {{ item.averageRating }} </p>
               <h3>Quartos Disponíveis</h3>
-              <div v-for="room in listRooms">
-              	{{ room.title }}
-              	{{ room.description }}
-              	{{ room.dimension }}
-              	{{ room.maxOccupancy }}
-              	{{ room.dailyRate }}
-              	{{ room.privateBathroom }}
-              	{{ room.balcony }}
-              	{{ room.airConditioning }}
-              	{{ room.tv }}
-              	{{ room.wardrobe }}
-              	{{ room.safeAvailable }}
-              	{{ room.accessibleForDisabled }}
-              	{{ room.forReservations }}
+              <div v-if="filteredRooms(item.id) <= 0">Não existe quartos disponíveis no momento</div>
+              <div v-for="room in filteredRooms(item.id)" class="room-card">
+                <div class="room-header">
+                  <div>
+                    <span class="room-title">{{ room.title }}</span>
+                    <button class="button" v-if="selectedRoomId != room.id" v-on:click="showRoomDetails(room.id)">Mostrar detalhes</button>
+                  </div>
+                </div>
+                <div v-if="selectedRoomId === room.id" class="room-details">
+                  <div>
+                  	<label for="check-in"><strong>Check In</strong></label>
+                    <input type="date" v-model="checkIn" class="input" name="check-in">
+                    <label for="check-out"><strong>Check Out</strong></label>
+                    <input type="date" v-model="checkOut" class="input" name="check-out">
+                    <input type="number" placeholder="Número de hóspedes" v-model="numberOfGuests" class="input"><br>
+                    <p class="warning-message">Verifique a disponibilidade</p>
+                    <div v-if="listReservationResult">
+                    </div>
+                    <br>
+                    <div v-if="status" class="result-section">
+                      <span v-if="numberOfGuests > room.maxOccupancy">Limite de {{ room.maxOccupancy }} pessoas </span>
+                      <p v-else class="result-text">
+                        Quarto:
+                        <span v-if="status === 'disponível'" class="result-status">{{ status }}<br>
+                          Total: <span class="result-total">{{ total }}</span><br>
+                        </span>
+                        <span v-else class="result-status result-not-available">{{ status }}</span><br>
+                        <span class="result-info">{{ info }}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <strong>Descrição:</strong> {{ room.description }}
+                  </div>
+                  <div>
+                    <strong>Dimensão:</strong> {{ room.dimension }} m²
+                  </div>
+                  <div>
+                    <strong>Ocupação Máxima:</strong> {{ room.maxOccupancy }} pessoas
+                  </div>
+                  <div>
+                    <strong>Diária:</strong> {{ room.dailyRate }}
+                  </div>
+                  <div>
+                    <strong>Recursos Disponíveis:</strong>
+                    <ul>
+                      <li v-if="room.privateBathroom">Banheiro Privativo</li>
+                      <li v-if="room.balcony">Sacada</li>
+                      <li v-if="room.airConditioning">Ar Condicionado</li>
+                      <li v-if="room.tv">TV</li>
+                      <li v-if="room.wardrobe">Guarda-roupa</li>
+                      <li v-if="room.safeAvailable">Cofre Disponível</li>
+                      <li v-if="room.accessibleForDisabled">Acessível para Deficientes</li>
+                      <li v-if="room.forReservations">Disponível para Reservas</li>
+                    </ul>
+                  </div>
+                  <button class="button" v-on:click="hideRoomDetails(room.id)">Minimizar</button>
+                </div>
               </div>
-              <button v-on:click="hideDetails">Minimizar</button>
+              <button class="button" v-on:click="hideDetails">Minimizar</button>
             </div>
           </address>
         </div>
       </li>
     </ul>
-    <div>
-    </div>
   </div>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://unpkg.com/vue-router@4"></script>
   <script src="main.js" type="text/javascript"></script>
 </body>
+
 </html>

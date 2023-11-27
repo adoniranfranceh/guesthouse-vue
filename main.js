@@ -1,6 +1,13 @@
 const app = Vue.createApp({
   data(){
-  	return{
+    return{
+    searchText: '',
+    checkIn: '',
+    checkOut: '',
+    numberOfGuests: '',
+    status: '',
+    total: '',
+    info: '',
       brand_name: 'Pousada Árvore da Coruja',
       city: 'Gramado',
 
@@ -23,36 +30,82 @@ const app = Vue.createApp({
                     check_in: '',
                     check_out: '',
                     average_rating: ''
+                  },
+
+                  {
+                    id: 2,
+                    brandName: 'Pousada Bela Vista',
+                    city: 'Gramado',
+                    phone: '8989898',
+                    email: '',
+                    address: '',
+                    neighborhood: '',
+                    state: '',
+                    city: '',
+                    zip_code: '',
+                    description: '',
+                    payment_methods: '',
+                    accepts_true: '',
+                    usage_policies: '',
+                    check_in: '',
+                    check_out: '',
+                    average_rating: ''
                   }
-      	        ],
+                ],
       listRooms: [
                     {
-                   	  innId: 1,
-                        title: 'Solarme Room'
+                       innId: 1,
+                      title: 'Solarme Room'
                     },
 
                     {
-                   	  innId: 1,
+                       innId: 1,
                       title: 'Bangalô Família'
                     }
                 ],
-      selectedId: null
-  	}
+      selectedId: null,
+      selectedRoomId: null
+    }
+  },
+
+  computed: {
+    listResult(){
+      if(this.searchText){
+        return this.listInns.filter(inn =>{
+
+          return inn.brandName.toLowerCase().includes(this.searchText.toLowerCase());
+
+        });
+      }else{
+        return this.listInns
+      }
+    },
+
+    listReservationResult() {
+      if (this.checkIn && this.checkOut) {
+        this.fetchData(this.selectedRoomId);
+      }
+    },
+
+  },
+
+  async mounted(){
+    this.listResult = await this.getInnData()
   },
 
   methods:{
-  	async getInnData(){
+    async getInnData(){
       let response = await fetch('http://localhost:3000/api/v1/inns')
       let data = await response.json()
       
       this.listInns = []
 
       data.forEach(item => {
-      	var inn = new Object
+        var inn = new Object
 
         inn.id             = item.id 
         inn.brandName      = item.brand_name
-      	inn.phone          = item.phone
+        inn.phone          = item.phone
         inn.email          = item.email
         inn.address        = item.address
         inn.neighborhood   = item.neighborhood
@@ -68,14 +121,14 @@ const app = Vue.createApp({
         inn.averageRating  = item.average_rating
         inn.listRooms = this.getRoomData(item.id)
 
+
         this.listInns.push(inn)
       });
-  	},
+    },
 
-  	async getRoomData(id){
+    async getRoomData(id){
       let response = await fetch(`http://localhost:3000/api/v1/inns/${id}/rooms`)
       let data = await response.json()
-      
       this.listRooms = []
 
       data.forEach(item => {
@@ -99,15 +152,36 @@ const app = Vue.createApp({
 
         this.listRooms.push(room)
       })
-  	},
+    },
 
-  	showDetails(id){
-  	  this.selectedId = id
-  	},
+    filteredRooms(id) {
+      return this.listRooms.filter(room => room.innId === id);
+    },
 
-  	hideDetails(){
-  	  this.selectedId = null
-  	}
+    async fetchData(id) {
+      let response = await fetch(`http://localhost:3000/api/v1/rooms/${id}/room_reservations/available/?check_in=${this.checkIn}&check_out=${this.checkOut}&number_of_guests=${this.numberOfGuests}`);
+      let data = await response.json();
+
+      this.status = data.status
+      this.total = data.total
+      this.info = data.info
+    },
+
+    showDetails(id){
+      this.selectedId = id
+    },
+
+    hideDetails(){
+      this.selectedId = null
+    },
+
+    showRoomDetails(id){
+      this.selectedRoomId = id
+    },
+
+    hideRoomDetails(id){
+    this.selectedRoomId = null
+    }
   }
   
 });
